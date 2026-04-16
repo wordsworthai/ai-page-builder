@@ -1,0 +1,8 @@
+[submodule "packages/liquid-compiler"]
+	path = packages/liquid-compiler
+	url = https://github.com/wordsworthai/liquid-compiler-service
+	branch = main
+[submodule "packages/webapp-libs/weditor/wwai_puck"]
+	path = packages/webapp-libs/weditor/wwai_puck
+	url = https://github.com/wordsworthai/puck-weditor.git
+	branch = wwai_version

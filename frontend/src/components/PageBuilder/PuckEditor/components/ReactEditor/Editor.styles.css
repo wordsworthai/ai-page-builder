@@ -1,0 +1,24 @@
+/* Puck Editor CSS Overrides - Simplified for iframe approach */
+.puck-editor-container {
+  font-family: inherit !important;
+  line-height: inherit !important;
+}
+
+.puck-editor-container * {
+  box-sizing: border-box !important;
+}
+
+/* Ensure Puck text components render correctly in edit mode */
+.puck-editor-container [data-puck-component="Text"] {
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: inherit !important;
+  color: inherit !important;
+}
+
+.puck-editor-container [data-puck-component="Heading"] {
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: inherit !important;
+  color: inherit !important;
+}

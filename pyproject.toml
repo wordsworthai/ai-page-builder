@@ -1,0 +1,145 @@
+[tool.poetry]
+name = "wwai-page-builder"
+version = "1.0.0"
+description = "AI-powered website page builder — FastAPI + React + Stripe"
+authors = ["Siddhant Manocha"]
+license = "MIT"
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+sqlmodel = "^0.0.27"
+boto3 = "^1.28.72"
+fastapi = "^0.119.0"
+uvicorn = "^0.40.0"
+sqlparse = "^0.4.4"
+fastapi-utils = "^0.8.0"
+python-dotenv = "^1.0.0"
+psycopg2-binary = "^2.9.9"
+alembic = "^1.14.1"
+asyncpg = "^0.28.0"
+greenlet = "^3.0.1"
+libpass = {extras = ["bcrypt"], version = "^1.9.1"}
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+python-multipart = "^0.0.6"
+fastapi-auth-middleware = "^1.0.2"
+reportlab = "^4.1.0"
+requests = "^2.31.0"
+requests-oauthlib = "^2.0.0"
+mailchimp-transactional = "^1.0.56"
+itsdangerous = "^2.1.2"
+jinja2 = "^3.1.4"
+pydantic = {extras = ["email"], version = "^2.12.3"}
+jwt = "^1.3.1"
+stripe = "^11.1.1"
+sqladmin = "^0.20.1"
+pydantic-settings = "^2.7.1"
+motor = "^3.7.1"
+redis = "^5.0.0"
+Pillow = "^11.3.0"
+
+
+sendgrid = "^6.12.5"
+google-cloud-secret-manager = "^2.16.0"
+google-cloud-bigquery = "^3.38.0"
+google-cloud-storage = "^3.6.0"
+filetype = "^1.2.0"
+langgraph-page-builder = { git = "https://github.com/wordsworthai/langgraph-page-builder.git", branch = "main" }
+httpx = "^0.28.1"
+google-auth = "^2.23.0"
+google-genai = "^1.0.0"
+cryptography = "^45.0.0"
+google-api-python-client = "^2.160.0"
+google-auth-oauthlib = "^1.2.0"
+google-auth-httplib2 = "^0.2.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+pytest-asyncio = "^0.23.0"
+pytest-cov = "^4.0.0"
+httpx = "^0.28.1"
+safety = "^3.0.0"
+mypy = "^1.8.0"
+aiosqlite = "^0.20.0"
+black = "^25.1.0"
+isort = "^6.0.1"
+flake8 = "^7.3.0"
+pylint = "^3.3.7"
+ruff = "^0.12.2"
+ipykernel = "^7.1.0"
+
+[tool.poetry.scripts]
+# Development commands (automatically load environment)
+dev = "uvicorn:main"
+serve = "uvicorn:main"
+migrate = "alembic:main"
+create-super = "app.commands.create_superuser:main"
+
+# Utility commands
+setup-payments = "scripts.setup_payments:main"
+create-products = "scripts.create_stripe_products:main"
+test-payments = "scripts.test_payment_setup:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "app/__pycache__/*",
+    "*/migrations/*",
+    "*/venv/*",
+    "*/virtualenvs/*",
+    "*/tests/*"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "libpass.*",
+    "jose.*",
+    "stripe.*",
+    "mailchimp_transactional.*",
+]
+ignore_missing_imports = true
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

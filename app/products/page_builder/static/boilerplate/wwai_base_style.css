@@ -1,0 +1,427 @@
+/* ========== Isolated Sections CSS utility ========== 
+* Creates a protective wrapper around custom sections to prevent 
+* theme styles from affecting section appearance 
+* Uses !important only for critical box model properties
+*/
+
+/* 
+* SECTION ISOLATION CONTAINER
+* All custom sections should be wrapped in this class
+* Example: <div class="wwai-isolated-section your-section-name">...</div>
+*/
+.wwai-isolated-section {
+    /* Reset the box model - critical layout property */
+    all: initial;
+    box-sizing: border-box !important;
+    /* Only use !important for this critical layout property */
+    display: block;
+    width: 100%;
+
+    /* Create a new stacking context to isolate z-index */
+    position: relative;
+    z-index: 1;
+
+    /* Define custom properties within this scope */
+    --wwai-spacing-unit: 8px;
+    --wwai-primary-color: #000000;
+    --wwai-secondary-color: #ffffff;
+    --wwai-accent-color: #0000ff;
+    --wwai-text-color: #333333;
+    --wwai-border-radius: 4px;
+    --wwai-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    /* Typography base */
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--wwai-text-color);
+    text-align: left;
+
+    /* Prevent inheritance from theme */
+    text-transform: none;
+    letter-spacing: normal;
+    word-spacing: normal;
+}
+
+/* Apply box-sizing to all elements within the isolated section */
+.wwai-isolated-section *,
+.wwai-isolated-section *::before,
+.wwai-isolated-section *::after {
+    box-sizing: border-box !important;
+}
+
+/* Base elements reset */
+.wwai-isolated-section h1,
+.wwai-isolated-section h2,
+.wwai-isolated-section h3,
+.wwai-isolated-section h4,
+.wwai-isolated-section h5,
+.wwai-isolated-section h6,
+.wwai-isolated-section p,
+.wwai-isolated-section ul,
+.wwai-isolated-section ol,
+.wwai-isolated-section li,
+.wwai-isolated-section blockquote,
+.wwai-isolated-section figure,
+.wwai-isolated-section fieldset,
+.wwai-isolated-section legend,
+.wwai-isolated-section textarea,
+.wwai-isolated-section pre,
+.wwai-isolated-section iframe,
+.wwai-isolated-section hr {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.wwai-isolated-section div[wwai-container],
+.wwai-isolated-section section[wwai-section] {
+    all: initial;
+    float: none;
+}
+
+/* Focus styles integrated with your design system */
+.wwai-isolated-section a:focus,
+.wwai-isolated-section button:focus,
+.wwai-isolated-section input:focus,
+.wwai-isolated-section select:focus,
+.wwai-isolated-section textarea:focus {
+    outline: none;
+    box-shadow: none;
+    border-radius: none;
+    transition: box-shadow 0.2s ease;
+}
+
+/* Typography */
+.wwai-isolated-section p {
+    margin-bottom: 0;
+}
+
+/* Lists */
+.wwai-isolated-section ul,
+.wwai-isolated-section ol {
+    margin-bottom: var(--wwai-spacing-unit);
+    padding-left: calc(var(--wwai-spacing-unit) * 3);
+}
+
+.wwai-isolated-section li {
+    margin-bottom: calc(var(--wwai-spacing-unit) / 2);
+}
+
+/* Links */
+.wwai-isolated-section a {
+    color: var(--wwai-accent-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.wwai-isolated-section a:hover {
+    text-decoration: none;
+}
+
+/* Images */
+.wwai-isolated-section img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Custom Shopify specifics to prevent theme interference */
+.wwai-isolated-section .shopify-section,
+.wwai-isolated-section .section,
+.wwai-isolated-section .wrapper {
+    padding: 0;
+    margin: 0;
+    max-width: none;
+}
+
+.wwai-page-width {
+    --page-width: 1400px;
+}
+
+.wwai-isolated-section .wwai-page-width {
+    max-width: var(--page-width);
+    margin: 0 auto;
+}
+
+.page-width {
+    --page-width: 1400px;
+}
+
+.wwai-isolated-section .page-width {
+    max-width: var(--page-width);
+    margin: 0 auto;
+}
+
+/* Avoid theme overrides for forms and inputs */
+.wwai-isolated-section input:not(.custom-input),
+.wwai-isolated-section select,
+.wwai-isolated-section textarea,
+.wwai-isolated-section label:not(.custom-label) {
+    /* border-radius: var(--wwai-border-radius);
+    /* border-radius: var(--wwai-border-radius);
+    border: 1px solid #ddd;
+    padding: var(--wwai-spacing-unit);
+    background-color: var(--wwai-secondary-color);
+    color: var(--wwai-text-color);
+    font-family: inherit;
+    font-size: 1em; */
+    line-height: 1.5;
+}
+
+
+/* ========== WWAI Media Query System ========== */
+/* 
+* Mobile-first responsive system with three breakpoints:
+* - small (sm): 400px and above (small tablets, large phones)
+* - medium (md): 800px and above (tablets, small desktops)
+* - large (lg): 1400px and above (large desktops, wide screens)
+*
+* Default styles apply to all screens under 400px (mobile phones)
+*/
+/* Base CSS Variables */
+:root {
+    /* Small tablets & large phones */
+    --wwai-breakpoint-small: 400px;
+    /* Tablets & small desktops */
+    --wwai-breakpoint-medium: 800px;
+    /* Large desktops & wide screens */
+    --wwai-breakpoint-large: 1400px;
+}
+
+/* 
+* Small tablets and large phones
+* Classes with the "small:" prefix apply at 400px and above
+*/
+@media (min-width: 400px) {
+    .wwai-small\:block {
+        display: block;
+    }
+
+    .wwai-small\:hidden {
+        display: none;
+    }
+}
+
+/* 
+MEDIUM SCREENS (800px+)
+* Tablets and small desktops
+* Classes with the "medium:" prefix apply at 800px and above
+*/
+@media (min-width: 800px) {
+    .wwai-medium\:block {
+        display: block;
+    }
+
+    .wwai-medium\:hidden {
+        display: none;
+    }
+}
+
+/* 
+LARGE SCREENS (1400px+)
+* Large desktops and wide screens
+* Classes with the "large:" prefix apply at 1400px and above
+*/
+@media (min-width: 1400px) {
+    .wwai-large\:block {
+        display: block;
+    }
+
+    .wwai-large\:hidden {
+        display: none;
+    }
+}
+
+/* ========== Utility class ========== */
+.wwai-isolated-section.wwai-debug {
+    outline: 2px dashed red;
+}
+
+.wwai-isolated-section.wwai-debug * {
+    outline: 1px dotted rgba(0, 0, 255, 0.2);
+}
+
+.wwai-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+.wwai-text-left {
+    text-align: left;
+}
+
+.wwai-text-center {
+    text-align: center;
+}
+
+.wwai-text-right {
+    text-align: right;
+}
+
+.wwai-block {
+    display: block;
+}
+
+.wwai-inline {
+    display: inline;
+}
+
+.wwai-inline-block {
+    display: inline-block;
+}
+
+.wwai-hidden {
+    display: none;
+}
+
+.wwai-isolated-section .wwai-visually-hidden,
+.wwai-isolated-section .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.wwai-isolated-section .desktop_video_container {
+    display: none;
+}
+
+.wwai-isolated-section .wwai_only_desktop_video .desktop_video_container {
+    display: block;
+}
+
+.wwai-isolated-section .mobile_video_container {
+    display: block;
+}
+
+.wwai-isolated-section .wwai_only_desktop_video .mobile_video_container {
+    display: none;
+}
+
+a.wwai_main_button{
+  display: inline-block;
+  margin: 0px;
+}
+
+@media (min-width: 769px) {
+    .wwai-isolated-section .desktop_video_container {
+        display: block;
+    }
+
+    .wwai-isolated-section .mobile_video_container {
+        display: none;
+    }
+}
+[data-wwai-btn] p {
+    margin-bottom: 0;
+}
+
+.swiper-button-next:after, .swiper-rtl .swiper-button-prev:after {
+    content: '';
+}
+
+.swiper-button-prev:after, .swiper-rtl .swiper-button-next:after {
+    content: '';
+}
+
+.scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.parent-container {
+    position: relative;
+    display: flex;
+}
+
+.left-container {
+    position: sticky;
+    height: max-content;
+    top: 0;
+} 
+
+.right-container {
+    position: sticky;
+}
+.wwai-w-full {
+    width: 100%;
+}
+
+.wwai-mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.wwai-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  
+  .wwai-col-half {
+    grid-column: span 1;
+  }
+  
+  .wwai-col-full {
+    grid-column: span 2;
+  }
+  
+  @media (max-width: 768px) {
+    .wwai-col-half,
+    .wwai-col-full {
+      grid-column: span 2;
+    }
+  }
+  
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  .wwai_checkbox__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+.wwai-form-field input,
+.wwai-form-field textarea,
+.wwai-form-field select {
+  width: 100%;
+}
+.wwai-form-field textarea {
+    resize: none;
+}
+.wwai-form-field select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='currentColor' stroke-width='1.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}

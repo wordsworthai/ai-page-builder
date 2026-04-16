@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "wwai-orchestration-service"
+version = "0.1.0"
+description = "AI Orchestration Service for WWAI Page Builder"
+authors = ["Wordsworth AI"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.119.0"
+uvicorn = "^0.40.0"
+pydantic = "^2.12.3"
+pydantic-settings = "^2.7.1"
+httpx = "^0.28.1"
+python-dotenv = "^1.0.0"
+
+# The main orchestration package (brings template-json-builder transitively)
+langgraph-page-builder = { git = "https://github.com/wordsworthai/langgraph-page-builder.git", branch = "main" }
+
+# Redis for any caching needs
+redis = "^5.0.0"
+
+# MongoDB
+motor = "^3.7.1"
+
+# Google Cloud (for secrets if needed)
+google-cloud-secret-manager = "^2.16.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

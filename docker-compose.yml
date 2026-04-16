@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:15.3-alpine3.18
+    volumes:
+      - /var/lib/postgresql/data
+      - ./postgres/databases:/docker-entrypoint-initdb.d
+    ports:
+      - "54323:5432"
+    restart: always
+    environment:
+      POSTGRES_USER: ${db_username:-pagebuilder}
+      POSTGRES_PASSWORD: ${db_password:-pagebuilder}
+      POSTGRES_DB: ${db_database:-pagebuilder}
+    hostname: postgres
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-d", "pagebuilder", "-U", "pagebuilder" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:7.0
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27020:27017"
+    restart: always
+    hostname: mongodb
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    restart: always
+    hostname: redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  default:
+    name: pagebuilder-app-local-dev-network
+
+volumes:
+  mongodb_data:
+  redis_data:
