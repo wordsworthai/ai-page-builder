@@ -2,48 +2,96 @@
 
 ## Prerequisites
 
-- Python 3.12+
+- Python 3.12+ (not 3.14 — some C extensions don't compile yet)
 - Node.js 18+
+- Yarn (for Puck editor submodule: `npm install -g yarn`)
 - Docker (for PostgreSQL, MongoDB, Redis)
 - [Task](https://taskfile.dev) runner (`brew install go-task` on macOS)
 - [Poetry](https://python-poetry.org/) (`pip install poetry`)
 
-## Installation
+## Installation (Step by Step)
+
+### 1. Clone and set up submodules
+
+The project uses two git submodules that are **not** auto-initialized on clone. You must clone them manually:
 
 ```bash
 git clone <repository-url>
-cd wwai-page-builder
+cd ai-page-builder
 
-# Backend
-poetry install
-
-# Frontend
-cd frontend && npm install && cd ..
-
-# Environment
-task setup-env          # copies local.env.example → local.env
-# Edit local.env with your values (see Configuration below)
+# Clone submodules (required — frontend depends on these)
+git clone --branch wwai_version https://github.com/wordsworthai/puck-weditor.git packages/webapp-libs/weditor/wwai_puck
+git clone --branch main https://github.com/wordsworthai/liquid-compiler-service packages/liquid-compiler
 ```
 
-Or use the all-in-one setup:
+### 2. Build the Puck editor
+
+The frontend depends on `@measured/puck` from the local submodule. You must build it before the frontend will compile:
 
 ```bash
-task full-setup
+cd packages/webapp-libs/weditor/wwai_puck
+yarn install
+cd packages/core && yarn build
+cd ../../../../..    # back to repo root
 ```
+
+### 3. Install backend dependencies
+
+```bash
+# Ensure Poetry uses Python 3.12 (not 3.14)
+poetry env use python3.12
+poetry install
+```
+
+### 4. Install orchestration service dependencies
+
+The orchestration service is a separate Poetry project:
+
+```bash
+cd orchestration_service
+poetry env use python3.12
+poetry lock && poetry install
+cd ..
+```
+
+### 5. Install frontend dependencies
+
+```bash
+cd frontend && npm install && cd ..
+```
+
+### 6. Set up environment
+
+```bash
+cp local.env.example local.env
+# Edit local.env with your values (see Configuration section below)
+
+# Frontend env (optional — has sensible defaults)
+cp frontend/.env.development.example frontend/.env.development
+```
+
+Key values to set in `local.env`:
+- **Database**: defaults work with docker-compose (`pagebuilder`/`pagebuilder`)
+- **Google OAuth**: set `google_oauth2_client_id` and `google_oauth2_secret` if you want Google login
+- **Stripe**: set test keys if you want billing features
+- **AI keys**: set `OPENAI_API_KEY` and/or `GEMINI_API_KEY` for page generation
 
 ## Quick Start
 
 ```bash
 # 1. Start infrastructure (PostgreSQL + MongoDB + Redis)
-task db:docker-start          # starts containers + runs migrations
+docker compose up -d
 
-# 2. Start all services (backend + orchestration + Redis)
+# 2. Apply database migrations
+task db:migrate-up
+
+# 3. Start all backend services (backend + orchestration + Redis)
 task dev
 
-# 3. Start frontend (separate terminal)
-task frontend:run             # React dev server at http://localhost:5173
+# 4. Start frontend (separate terminal)
+task run-frontend             # React dev server at http://localhost:5173
 
-# 4. Create an admin account
+# 5. Create an admin account
 task db:user-create -- --email you@example.com --password yourpassword --full_name "Your Name"
 ```
 
@@ -55,28 +103,30 @@ The backend API docs are at http://localhost:8020/docs.
 
 The app has three services. Run each in a separate terminal, or use `task dev` for the backend pair.
 
+| Service | Port | Command |
+|---------|------|---------|
+| Backend API | 8020 | `task run-backend` |
+| Orchestration (LangGraph) | 8081 | `task run-orchestration` |
+| Frontend (Vite) | 5173 | `task run-frontend` |
+
 ### Backend API
 
 ```bash
-task backend:run              # FastAPI on port 8020 (auto-reloads, loads local.env)
+task run-backend              # FastAPI on port 8020 (auto-reloads, loads local.env)
 ```
 
 ### Orchestration Service
 
-```bash
-task orchestration:run        # LangGraph workflows on port 8081 (auto-reloads)
-```
-
-Requires its own `poetry install` in `orchestration_service/`:
+The orchestration service handles AI page generation workflows. **It must be running for page generation to work.**
 
 ```bash
-task orchestration:install
+task run-orchestration        # LangGraph workflows on port 8081 (auto-reloads)
 ```
 
 ### Frontend
 
 ```bash
-task frontend:run             # Vite dev server on port 5173
+task run-frontend             # Vite dev server on port 5173
 ```
 
 For development with the Puck editor in watch mode (auto-rebuilds on Puck changes):

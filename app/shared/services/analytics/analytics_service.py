@@ -5,7 +5,7 @@ Provides analytics and reporting features with plan-based access control.
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from typing import List, Dict, Any, Optional
 
 from fastapi import Depends, HTTPException, status

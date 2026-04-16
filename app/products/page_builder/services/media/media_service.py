@@ -7,7 +7,7 @@ import logging
 import os
 import tempfile
 import hashlib
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional, Dict, Any, Tuple
 
 import httpx
@@ -854,7 +854,7 @@ class MediaService:
             ReviewPhotosInput,
             BusinessPhotosInput
         )
-        from datetime import datetime
+        from datetime import datetime, UTC
         
         logo_provider = LogoProvider()
         review_photos_provider = ReviewPhotosProvider()

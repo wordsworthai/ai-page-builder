@@ -1,7 +1,7 @@
 """Media API endpoints for file uploads and stock ingestion."""
 from typing import Optional, List
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, Body
-from datetime import datetime
+from datetime import datetime, UTC
 
 from app.products.page_builder.services.media.media_service import MediaService, get_media_service
 from app.products.page_builder.services.media.shutterstock_service import ShutterstockService, get_shutterstock_service

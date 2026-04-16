@@ -2,7 +2,7 @@
 import logging
 import time
 import uuid
-from datetime import datetime
+from datetime import datetime, UTC
 
 import boto3
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile

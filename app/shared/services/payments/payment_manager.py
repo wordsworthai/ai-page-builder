@@ -5,7 +5,7 @@ Handles both subscription and one-time payments with comprehensive error handlin
 
 import logging
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from typing import Dict, List, Optional, Union
 
 import stripe

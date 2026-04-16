@@ -5,7 +5,7 @@ Centralizes logic for initial_input creation from source + overrides.
 import logging
 import uuid
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Any, Dict, Optional
 
 from fastapi import HTTPException

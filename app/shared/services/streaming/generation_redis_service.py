@@ -9,7 +9,7 @@ from redis.connection import ConnectionPool
 import time
 import logging
 from typing import Optional, Dict, Any, List
-from datetime import datetime
+from datetime import datetime, UTC
 import uuid
 
 from app.core.config_redis import redis_config

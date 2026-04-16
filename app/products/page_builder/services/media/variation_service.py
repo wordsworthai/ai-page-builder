@@ -4,7 +4,7 @@ Creates downscaled variations for optimized delivery.
 """
 import asyncio
 import functools
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional, Dict, Tuple
 from io import BytesIO
 

@@ -9,7 +9,20 @@ const puckCorePath = path.resolve(
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      // Stub out Node.js-only modules that are dynamically imported in liquid-compiler
+      // (node-fetch is guarded by isNodeEnvironment() at runtime but Vite resolves statically)
+      name: 'stub-node-only-modules',
+      resolveId(id) {
+        if (id === 'node-fetch' || id === 'sharp') return id;
+      },
+      load(id) {
+        if (id === 'node-fetch' || id === 'sharp') return 'export default {}';
+      },
+    },
+  ],
   resolve: {
     alias: [
       { find: "@", replacement: path.resolve(__dirname, "src") },
@@ -80,6 +93,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
+      external: ['node-fetch', 'sharp'],
       output: {
         manualChunks: {
           // React ecosystem

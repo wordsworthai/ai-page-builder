@@ -5,7 +5,7 @@ import asyncio
 import functools
 import hashlib
 import logging
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 
 from botocore.exceptions import ClientError, NoCredentialsError

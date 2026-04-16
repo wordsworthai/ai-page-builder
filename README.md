@@ -11,35 +11,49 @@ Get up and running in minutes:
 
 ### Prerequisites
 
-- [Python 3.12+](https://www.python.org/downloads/)
+- [Python 3.12](https://www.python.org/downloads/) (not 3.14 — some C extensions don't compile yet)
 - [Poetry](https://python-poetry.org/docs/#installation)
 - [Docker](https://docs.docker.com/get-docker/)
 - [Taskfile](https://taskfile.dev/#/installation)
 - [Node.js 18+](https://nodejs.org/) (for frontend)
+- [Yarn](https://yarnpkg.com/) (for Puck editor submodule)
 
-### Complete Setup (One Command)
+### Setup
 
 ```bash
-# Complete project setup for new developers
-task full-setup
+# 1. Clone repo and submodules
+git clone <repository-url>
+cd ai-page-builder
+git clone --branch wwai_version https://github.com/wordsworthai/puck-weditor.git packages/webapp-libs/weditor/wwai_puck
+git clone --branch main https://github.com/wordsworthai/liquid-compiler-service packages/liquid-compiler
+
+# 2. Build the Puck editor (frontend depends on this)
+cd packages/webapp-libs/weditor/wwai_puck && yarn install && cd packages/core && yarn build && cd ../../../../../..
+
+# 3. Install dependencies
+poetry env use python3.12 && poetry install
+cd orchestration_service && poetry env use python3.12 && poetry lock && poetry install && cd ..
+cd frontend && npm install && cd ..
+
+# 4. Environment
+cp local.env.example local.env          # edit with your API keys
+cp frontend/.env.development.example frontend/.env.development
+
+# 5. Start databases and apply migrations
+docker compose up -d
+task db:migrate-up
+
+# 6. Create an account
+task db:user-create -- --email you@example.com --password yourpassword --full_name "Your Name"
 ```
 
-This automatically:
-- ✅ Installs all dependencies (backend & frontend)
-- ✅ Sets up environment files
-- ✅ Starts local database
-- ✅ Applies database migrations
-
-### Development Workflow
+### Run
 
 ```bash
-# 1. Start backend (Terminal 1)
-task run-backend
+# Terminal 1 — backend + orchestration + Redis
+task dev
 
-# 2. Generate API client (Terminal 2)
-task generate-client
-
-# 3. Start frontend (Terminal 3)  
+# Terminal 2 — frontend
 task run-frontend
 ```
 

@@ -1,7 +1,7 @@
 """Template save endpoint - PUT template updates."""
 import asyncio
 import logging
-from datetime import datetime
+from datetime import datetime, UTC
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException

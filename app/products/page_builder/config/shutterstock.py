@@ -10,7 +10,7 @@ def _get_env_files():
 class ShutterstockConfig(BaseSettings):
     """Shutterstock API configuration."""
 
-    api_token: str
+    api_token: str = ""  # optional — needed for Shutterstock stock image search
     base_url: str = "https://api.shutterstock.com/v2"
 	
     model_config = SettingsConfigDict(

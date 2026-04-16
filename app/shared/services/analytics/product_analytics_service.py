@@ -4,7 +4,7 @@ Product Analytics Service
 Handles storage and retrieval of product analytics events in MongoDB.
 """
 
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional, Dict, Any
 import logging
 

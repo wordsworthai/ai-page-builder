@@ -5,7 +5,7 @@ Accumulates node-update and status-poll stats keyed by generation_version_id.
 Thread-safe via asyncio.Lock. Used only when RECORD_PERFORMANCE_METRICS is True.
 """
 import threading
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Dict, Any, Optional
 
 # Bounded list size for percentile computation (p50, p95)

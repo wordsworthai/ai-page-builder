@@ -12,9 +12,9 @@ class AWSConfig(BaseSettings):
         extra="ignore"
     )
     
-    # AWS Credentials
-    AWS_ACCESS_KEY_ID: str
-    AWS_SECRET_ACCESS_KEY: str
+    # AWS Credentials (optional — only required for S3 publishing/CloudFront features)
+    AWS_ACCESS_KEY_ID: str = ""
+    AWS_SECRET_ACCESS_KEY: str = ""
     AWS_REGION: str = "us-east-1"
     
     # S3 Configuration

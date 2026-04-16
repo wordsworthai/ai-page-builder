@@ -10,7 +10,7 @@ import random
 import uuid
 from uuid import uuid4
 from typing import List, Dict, Optional
-from datetime import datetime
+from datetime import datetime, UTC
 from io import BytesIO
 
 from PIL import Image

@@ -1,7 +1,7 @@
 """Handle workflow completion and post-workflow template processing."""
 import logging
 import uuid
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 
 from fastapi import HTTPException

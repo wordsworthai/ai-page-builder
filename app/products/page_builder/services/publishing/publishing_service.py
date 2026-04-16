@@ -7,7 +7,7 @@ import functools
 import hashlib
 import re
 import uuid
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional, List
 
 import boto3

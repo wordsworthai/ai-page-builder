@@ -5,7 +5,7 @@ Handles all subscription and payment related webhook events
 
 import logging
 import uuid
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Any, Dict, Optional
 
 import stripe
