@@ -189,7 +189,8 @@ venv311/*
 
 wedge-product-deepdive
 
-hip-phoenix-449412-s8-e8c2dc2e33db.json
+*-service-account.json
+*-credentials.json
 
 build.env
 notebooks/

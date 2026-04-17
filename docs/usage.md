@@ -74,7 +74,7 @@ Key values to set in `local.env`:
 - **Database**: defaults work with docker-compose (`pagebuilder`/`pagebuilder`)
 - **Google OAuth**: set `google_oauth2_client_id` and `google_oauth2_secret` if you want Google login
 - **Stripe**: set test keys if you want billing features
-- **AI keys**: set `OPENAI_API_KEY` and/or `GEMINI_API_KEY` for page generation
+- **AI keys**: set `GEMINI_API_KEY` for image generation; the orchestration service uses its own LLM keys (see `orchestration_service/` env setup)
 
 ## Quick Start
 
@@ -263,6 +263,7 @@ All backend configuration loads from `local.env` (dev) or `prod.env` (production
 | `db_database` | PostgreSQL database | `pagebuilder` |
 | `mongodb_url` | MongoDB connection URI | `mongodb://localhost:27020` |
 | `mongodb_database` | MongoDB database name | `businesses` |
+| `AGENT_MONGODB_URL` | Separate MongoDB for orchestration artifacts (optional — falls back to `mongodb_url`) | `mongodb://localhost:27020/` |
 | `secret_key` | JWT signing secret | `dev-secret-key-...` |
 | `domain` | Frontend URL (for CORS + cookies) | `http://localhost:5173` |
 | `BACKEND_URL` | Backend URL | `http://localhost:8020` |
@@ -284,6 +285,7 @@ All backend configuration loads from `local.env` (dev) or `prod.env` (production
 |----------|---------|---------|
 | `google_oauth2_client_id` | Google OAuth client ID | _(disabled)_ |
 | `google_oauth2_secret` | Google OAuth secret | _(disabled)_ |
+| `GEMINI_API_KEY` | Google Gemini API key for AI image generation | _(disabled)_ |
 | `SENDGRID_API_KEY` | SendGrid for transactional email | _(emails disabled)_ |
 | `NANGO_SECRET_KEY` | Nango connectors (Google Drive, etc.) | _(connectors disabled)_ |
 | `SHUTTERSTOCK_API_TOKEN` | Stock photo search | _(disabled)_ |
@@ -299,6 +301,7 @@ All backend configuration loads from `local.env` (dev) or `prod.env` (production
 | `AWS_REGION` | AWS region (default: `us-east-1`) |
 | `S3_BUCKET_NAME` | S3 bucket for published HTML |
 | `S3_MEDIA_BUCKET_NAME` | S3 bucket for media uploads |
+| `S3_PREVIEW_BUCKET_NAME` | S3 bucket for generation preview HTML |
 | `CLOUDFRONT_DISTRIBUTION_ID` | CloudFront distribution ID |
 | `CLOUDFRONT_DOMAIN` | CloudFront domain |
 

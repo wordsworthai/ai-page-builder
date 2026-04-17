@@ -5,7 +5,7 @@ Tests model structure, validation, and basic functionality.
 
 import pytest
 from sqlmodel import Session
-from datetime import datetime, UTC
+from datetime import datetime
 import uuid
 
 from app.shared.models import User

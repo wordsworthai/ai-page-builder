@@ -7,7 +7,7 @@ import logging
 import os
 import tempfile
 import hashlib
-from datetime import datetime, UTC
+from datetime import datetime
 from typing import Optional, Dict, Any, Tuple
 
 import httpx

@@ -274,7 +274,7 @@ async def bulk_ingest_stock_media(
     {
         "prompts": ["A plumber fixing a copper pipe", "HVAC technician installing AC unit"],
         "trade_type": "plumbing",
-        "org_id": "0a640051-51f7-4684-a254-f73d4fb4da03",
+        "org_id": "00000000-0000-0000-0000-000000000000",
         "aspect_ratio": "16:9",
         "image_size": "2K",
         "use_realtime": true
@@ -286,7 +286,7 @@ async def bulk_ingest_stock_media(
     {
         "prompts": ["prompt1", "prompt2", "...50 more prompts..."],
         "trade_type": "hvac",
-        "org_id": "0a640051-51f7-4684-a254-f73d4fb4da03",
+        "org_id": "00000000-0000-0000-0000-000000000000",
         "use_realtime": false
     }
 ```
