@@ -54,6 +54,7 @@ class Settings(BaseSettings):
     aws_access_key_id: Optional[str] = None
     aws_secret_access_key: Optional[str] = None
     aws_region: str = "us-east-1"
+    s3_bucket_name: str = "my-pages"
     s3_preview_bucket_name: Optional[str] = None
 
     # Required by agent orchestration (HTML compilation / bundle_pipeline_pkg)

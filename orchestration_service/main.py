@@ -8,6 +8,12 @@ os.environ.setdefault("NODE_SERVER_URL", os.environ.get("NODE_SERVER_URL", "http
 from orchestration_service.config import settings
 import logging
 
+# Push S3_BUCKET_NAME and region before any wwai_agent_orchestration import so
+# template_json_builder (which reads os.environ at import time) sees the right values.
+# template_json_builder reads AWS_DEFAULT_REGION (not AWS_REGION).
+os.environ.setdefault("S3_BUCKET_NAME", settings.s3_bucket_name)
+os.environ.setdefault("AWS_DEFAULT_REGION", settings.aws_region)
+
 # AGENT_MONGODB_URL first, secret fallback: configure package DB before any import that touches db_manager.
 # If URI is set, the first (and only) connection uses it; else the package uses from_env() (Secret Manager).
 _uri = getattr(settings, "agent_mongodb_url", None) or getattr(settings, "mongodb_url", None)

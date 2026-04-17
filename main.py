@@ -14,6 +14,12 @@ if env_path.exists():
     from dotenv import load_dotenv
     load_dotenv(env_path)
 
+# Ensure S3_BUCKET_NAME and region are in os.environ so template_json_builder
+# (which reads os.environ at import time) gets the right values.
+# template_json_builder reads AWS_DEFAULT_REGION (not AWS_REGION).
+os.environ.setdefault("S3_BUCKET_NAME", "my-pages")
+os.environ.setdefault("AWS_DEFAULT_REGION", os.environ.get("AWS_REGION", "us-east-1"))
+
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware import Middleware
