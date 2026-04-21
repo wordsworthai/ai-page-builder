@@ -387,7 +387,7 @@ class PublishingService:
         
         # 2. Process HTML
         try:
-            base_url = (config.backend_url or "").strip() or "http://localhost:8020"
+            base_url = (config.public_backend_url or config.domain or "").strip() or "http://localhost:8020"
             form_submit_endpoint = f"{base_url.rstrip('/')}/api/forms/form-submissions"
             processed_html = process_html_for_publishing(
                 html_content=html_content.decode('utf-8'),

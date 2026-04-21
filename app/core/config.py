@@ -99,9 +99,13 @@ class BaseConfig(BaseSettings):
     domain: str = Field(
         default="http://localhost:3000", description="Application domain"
     )
-    # Backend URL for internal callbacks
+    # Backend URL for internal service-to-service callbacks (e.g. orchestration → app)
     backend_url: str = Field(
-        default="http://localhost:8020", description="Backend application URL"
+        default="http://localhost:8020", description="Internal backend URL (Docker: http://app:8080)"
+    )
+    # Public-facing backend URL for URLs embedded in published pages (e.g. form submissions)
+    public_backend_url: str = Field(
+        default="", description="Public backend URL (e.g. https://try.getwordsworth.ai). Falls back to domain."
     )
     redirect_after_login: str = Field(
         default="http://localhost:5173/dashboard", description="Redirect URL after login"
