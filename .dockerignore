@@ -1,0 +1,43 @@
+# Git
+.git/
+.gitignore
+.gitmodules
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Node (frontend installs fresh inside Docker)
+frontend/node_modules/
+packages/webapp-libs/
+
+# Virtual environments
+.venv/
+
+# IDE
+.vscode/
+.idea/
+.cursor/
+.claude/
+
+# Env files (passed via --env-file, not baked into image)
+local.env
+prod.env
+cp-prod.env
+*.env.example
+
+# Deploy folder (Dockerfiles are referenced by path, not copied)
+deploy/
+
+# Docs
+docs/
+*.md
+LICENSE
+
+# OS
+.DS_Store

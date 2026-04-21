@@ -109,8 +109,10 @@ pip-selfcheck.json
 prod.env
 cp-prod.env
 local.env
-deploy/
-packages/webapp-libs/
+packages/webapp-libs/*
+!packages/webapp-libs/weditor/
+packages/webapp-libs/weditor/*
+!packages/webapp-libs/weditor/wwai_puck
 frontend/.env.development
 frontend/.env.production
 postgres/.env.postgres

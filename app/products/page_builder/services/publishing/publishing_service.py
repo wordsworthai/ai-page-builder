@@ -49,18 +49,20 @@ class PublishingService:
         self.request = request
         
         # Boto3 clients are synchronous. We will run methods in a thread pool.
+        # Publishing uses its own bucket/region (falls back to general AWS config if not set)
+        self.publish_bucket = aws_config.publish_bucket
         self.s3_client = boto3.client(
             "s3",
-            endpoint_url=aws_config.S3_ENDPOINT_URL,
+            **({"endpoint_url": aws_config.publish_endpoint_url} if aws_config.publish_endpoint_url else {}),
             aws_access_key_id=aws_config.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=aws_config.AWS_SECRET_ACCESS_KEY,
-            region_name=aws_config.AWS_REGION
+            region_name=aws_config.publish_region
         )
         self.cloudfront_client = boto3.client(
             "cloudfront",
             aws_access_key_id=aws_config.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=aws_config.AWS_SECRET_ACCESS_KEY,
-            region_name=aws_config.AWS_REGION
+            region_name=aws_config.publish_region
         )
 
 
@@ -73,7 +75,7 @@ class PublishingService:
         key = f"{storage_folder}/{WWAI_BASE_STYLE_FILENAME}"
         await self._run_in_thread(
             self.s3_client.put_object,
-            Bucket=aws_config.S3_BUCKET_NAME,
+            Bucket=self.publish_bucket,
             Key=key,
             Body=body,
             ContentType="text/css",
@@ -373,7 +375,7 @@ class PublishingService:
             # Non-blocking Favicon Upload
             await self._run_in_thread(
                 self.s3_client.put_object,
-                Bucket=aws_config.S3_BUCKET_NAME,
+                Bucket=self.publish_bucket,
                 Key=f"{storage_folder}/{favicon_filename}",
                 Body=favicon_content,
                 ContentType=self._get_favicon_content_type(favicon_filename),
@@ -419,8 +421,8 @@ class PublishingService:
         try:
             await self._run_in_thread(
                 self.s3_client.copy_object,
-                Bucket=aws_config.S3_BUCKET_NAME,
-                CopySource={'Bucket': aws_config.S3_BUCKET_NAME, 'Key': s3_path},
+                Bucket=self.publish_bucket,
+                CopySource={'Bucket': self.publish_bucket, 'Key': s3_path},
                 Key=backup_key
             )
         except Exception:
@@ -530,7 +532,7 @@ class PublishingService:
 
             await self._run_in_thread(
                 self.s3_client.put_object,
-                Bucket=aws_config.S3_BUCKET_NAME,
+                Bucket=self.publish_bucket,
                 Key=f"{storage_folder}/{favicon_filename}",
                 Body=favicon_content,
                 ContentType=self._get_favicon_content_type(favicon_filename),
@@ -594,8 +596,8 @@ class PublishingService:
             try:
                 await self._run_in_thread(
                     self.s3_client.copy_object,
-                    Bucket=aws_config.S3_BUCKET_NAME,
-                    CopySource={'Bucket': aws_config.S3_BUCKET_NAME, 'Key': s3_path},
+                    Bucket=self.publish_bucket,
+                    CopySource={'Bucket': self.publish_bucket, 'Key': s3_path},
                     Key=backup_key
                 )
             except Exception:
@@ -731,7 +733,7 @@ class PublishingService:
         def _perform_move():
             # 1. List
             paginator = self.s3_client.get_paginator('list_objects_v2')
-            pages = paginator.paginate(Bucket=aws_config.S3_BUCKET_NAME, Prefix=f"{old_folder}/")
+            pages = paginator.paginate(Bucket=self.publish_bucket, Prefix=f"{old_folder}/")
             
             objects_to_delete = []
             
@@ -745,8 +747,8 @@ class PublishingService:
                     
                     # 2. Copy
                     self.s3_client.copy_object(
-                        CopySource={'Bucket': aws_config.S3_BUCKET_NAME, 'Key': old_key},
-                        Bucket=aws_config.S3_BUCKET_NAME,
+                        CopySource={'Bucket': self.publish_bucket, 'Key': old_key},
+                        Bucket=self.publish_bucket,
                         Key=new_key
                     )
                     
@@ -756,21 +758,20 @@ class PublishingService:
             # 3. Delete (Simple batch, assuming < 1000 files)
             if delete_old and objects_to_delete:
                 self.s3_client.delete_objects(
-                    Bucket=aws_config.S3_BUCKET_NAME,
+                    Bucket=self.publish_bucket,
                     Delete={'Objects': objects_to_delete}
                 )
 
         try:
             await self._run_in_thread(_perform_move)
         except Exception as e:
-            print(f"S3 move error: {e}")
             raise HTTPException(status_code=500, detail=f"Failed to move files: {str(e)}")
     
     def _upload_to_s3_sync(self, key: str, content: bytes, content_type: str) -> bool:
         """Synchronous upload helper for use in thread pool"""
         try:
             self.s3_client.put_object(
-                Bucket=aws_config.S3_BUCKET_NAME,
+                Bucket=self.publish_bucket,
                 Key=key,
                 Body=content,
                 ContentType=content_type,
