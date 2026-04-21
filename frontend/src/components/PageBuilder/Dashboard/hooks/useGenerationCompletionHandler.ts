@@ -59,6 +59,12 @@ export function useGenerationCompletionHandler({
     const compilationKey = getCompilationKey(effectiveGenerationId || undefined);
 
     if (compilationKey && localStorage.getItem(compilationKey) === 'true') {
+      // Compilation was already attempted — if there's still no preview_link,
+      // it means the previous attempt failed. Show error instead of spinning forever.
+      if (!websiteData?.homepage?.preview_link) {
+        setErrorMessage('compilation_failed');
+        setComponentState('error');
+      }
       return;
     }
 

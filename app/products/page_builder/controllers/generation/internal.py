@@ -321,10 +321,10 @@ async def compile_preview(
 
         s3_client = boto3.client(
             "s3",
-            endpoint_url=aws_config.S3_ENDPOINT_URL,
+            **({"endpoint_url": aws_config.preview_endpoint_url} if aws_config.preview_endpoint_url else {}),
             aws_access_key_id=aws_config.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=aws_config.AWS_SECRET_ACCESS_KEY,
-            region_name=aws_config.AWS_REGION,
+            region_name=aws_config.preview_region,
         )
 
         s3_key = f"previews/{business_id}/{generation_version_id}/index.html"
@@ -350,7 +350,7 @@ async def compile_preview(
         except Exception as e:
             logger.warning(f"WWAI boilerplate CSS upload failed: {e}")
 
-        preview_link = f"https://{aws_config.S3_PREVIEW_BUCKET_NAME}.s3.amazonaws.com/{s3_key}"
+        preview_link = f"https://{aws_config.S3_PREVIEW_BUCKET_NAME}.s3.{aws_config.preview_region}.amazonaws.com/{s3_key}"
 
         page.preview_link = preview_link
         page.current_generation_id = generation_version_id

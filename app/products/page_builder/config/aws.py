@@ -21,6 +21,7 @@ class AWSConfig(BaseSettings):
     S3_BUCKET_NAME: str = "my-pages"
     S3_MEDIA_BUCKET_NAME: str = "my-pages-media"
     S3_PREVIEW_BUCKET_NAME: str = "my-previews"
+    S3_PREVIEW_REGION: str = ""
     S3_ENDPOINT_URL: str = ""
 
     # S3 Publish Configuration (separate bucket/region for final published pages served via CloudFront)
@@ -31,6 +32,16 @@ class AWSConfig(BaseSettings):
     # CloudFront Configuration
     CLOUDFRONT_DISTRIBUTION_ID: str = ""
     CLOUDFRONT_DOMAIN: str = "example.com"
+
+    @property
+    def preview_region(self) -> str:
+        return self.S3_PREVIEW_REGION or self.AWS_REGION
+
+    @property
+    def preview_endpoint_url(self) -> str | None:
+        if self.S3_PREVIEW_REGION:
+            return None
+        return self.S3_ENDPOINT_URL or None
 
     @property
     def publish_bucket(self) -> str:

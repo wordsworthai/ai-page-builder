@@ -51,7 +51,7 @@ const WebsiteComponent: React.FC = () => {
     generationId: effectiveGenerationId,
     enabled: shouldPollGeneration,
   });
-  const { compilationStatus, error: compilationError } = usePreviewCompilation();
+  const { compilePreview, compilationStatus, error: compilationError } = usePreviewCompilation();
 
   const { mutate: retryGeneration, isPending: isRetrying } = useGenerationRetry({
     onSuccess: () => {
@@ -94,15 +94,38 @@ const WebsiteComponent: React.FC = () => {
     setErrorMessage,
   });
 
+  const isCompilationError = errorMessage === 'compilation_failed' ||
+    (errorMessage?.includes('compile') ?? false) ||
+    (errorMessage?.includes('preview') ?? false);
+
+  const handleRetryCompilation = async () => {
+    if (!effectiveGenerationId) return;
+
+    const key = getCompilationKey(effectiveGenerationId);
+    if (key) {
+      localStorage.removeItem(key);
+    }
+
+    setHasTriggeredCompilation(false);
+    setErrorMessage(null);
+    setComponentState('compiling');
+
+    try {
+      const result = await compilePreview(effectiveGenerationId);
+      setComponentState('ready');
+      navigate(`/editor/${result.generation_version_id}`);
+    } catch {
+      setErrorMessage('compilation_failed');
+      setComponentState('error');
+    }
+  };
+
   const handleRetry = () => {
     if (!effectiveGenerationId) {
-      // If we don't know which generation to resume, fall back to starting over
       handleCreateWebsite();
       return;
     }
 
-    // Clear the compilation flag so a fresh compilation can run when the resumed
-    // workflow completes again.
     const key = getCompilationKey(effectiveGenerationId);
     if (key) {
       localStorage.removeItem(key);
@@ -172,7 +195,8 @@ const WebsiteComponent: React.FC = () => {
         errorMessage={errorMessage}
         lastSuccessfulGenerationId={getLastSuccessfulGenerationId(websiteData)}
         isRetrying={isRetrying}
-        onRetry={handleRetry}
+        isCompilationError={isCompilationError}
+        onRetry={isCompilationError ? handleRetryCompilation : handleRetry}
         onGoToLastVersion={() => {
           const lastId = getLastSuccessfulGenerationId(websiteData);
           if (lastId) {
@@ -180,6 +204,9 @@ const WebsiteComponent: React.FC = () => {
             navigate(`/editor/${lastId}`);
           }
         }}
+        onGoToEditor={isCompilationError && effectiveGenerationId ? () => {
+          navigate(`/editor/${effectiveGenerationId}`);
+        } : undefined}
         onStartOver={handleCreateWebsite}
       />
     );
