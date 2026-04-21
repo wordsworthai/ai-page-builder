@@ -109,6 +109,8 @@ pip-selfcheck.json
 prod.env
 cp-prod.env
 local.env
+deploy/
+packages/webapp-libs/
 frontend/.env.development
 frontend/.env.production
 postgres/.env.postgres
@@ -195,3 +197,4 @@ wedge-product-deepdive
 build.env
 notebooks/
 .vscode/
+.secrets.local.json
