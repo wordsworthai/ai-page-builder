@@ -119,6 +119,7 @@ def process_html_for_publishing(
     4. Add favicon link
     5. Inject Tailwind CDN script (with preload + FOUC veil + readiness observer)
     6. Inject window.FORM_SUBMIT_ENDPOINT (for published page forms)
+    7. Inject smooth-scroll script for same-page anchor links (cross-page fallback to /#id)
 
     Args:
         html_content: Raw HTML string
@@ -168,6 +169,9 @@ def process_html_for_publishing(
     # 6. Inject form submit endpoint (for published page forms)
     if form_submit_endpoint:
         html_content = _inject_form_submit_endpoint(html_content, form_submit_endpoint)
+
+    # 7. Inject smooth-scroll for anchor links
+    html_content = _inject_smooth_scroll_script(html_content)
 
     return html_content
 
@@ -411,6 +415,54 @@ def _inject_form_submit_endpoint(html: str, endpoint_url: str) -> str:
         flags=re.IGNORECASE
     )
 
+    return html
+
+
+def _inject_smooth_scroll_script(html: str) -> str:
+    """
+    Inject a smooth-scroll script before closing </body> tag.
+
+    Handles two cases:
+    - Target exists on current page: smooth scroll to it.
+    - Target doesn't exist (e.g. #contact-us link on /services page): navigate
+      to /#id so the homepage can scroll to the section.
+    On page load, if the URL has a hash, smooth scroll to that element
+    (handles arriving via /#id redirect from a subpage).
+    """
+    script = (
+        '<script>'
+        '(function(){'
+        'document.addEventListener("click",function(e){'
+        'var link=e.target.closest("a[href^=\'#\']");'
+        'if(!link)return;'
+        'var id=link.getAttribute("href").slice(1);'
+        'if(!id)return;'
+        'var target=document.getElementById(id);'
+        'if(target){'
+        'e.preventDefault();'
+        'target.scrollIntoView({behavior:"smooth"});'
+        'history.replaceState(null,"","#"+id);'
+        '}else if(window.location.pathname!=="/"&&window.location.pathname!=="")'
+        '{'
+        'e.preventDefault();'
+        'window.location.href="/#"+id;'
+        '}'
+        '});'
+        'if(window.location.hash){'
+        'var id=window.location.hash.slice(1);'
+        'var target=document.getElementById(id);'
+        'if(target){setTimeout(function(){target.scrollIntoView({behavior:"smooth"});},100);}'
+        '}'
+        '})();'
+        '</script>'
+    )
+    html = re.sub(
+        r'(</body>)',
+        rf'    {script}\n\1',
+        html,
+        count=1,
+        flags=re.IGNORECASE,
+    )
     return html
 
 
