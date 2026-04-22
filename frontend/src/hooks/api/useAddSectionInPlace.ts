@@ -7,7 +7,7 @@ import {
   PageGenerationService,
   AddSectionInPlaceRequest as ApiAddSectionInPlaceRequest,
 } from '@/client';
-import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { useSnackBarContext } from '@/context/SnackBarContext';
 
 export interface AddSectionInPlaceRequest {
   generationVersionId: string;
@@ -18,7 +18,7 @@ export interface AddSectionInPlaceRequest {
 }
 
 export const useAddSectionInPlace = () => {
-  const { handleApiError } = useErrorHandler();
+  const { createSnackBar } = useSnackBarContext();
 
   return useMutation({
     mutationFn: async ({
@@ -42,8 +42,14 @@ export const useAddSectionInPlace = () => {
             replace_index: replaceIndex,
           }
         );
-      } catch (error) {
-        handleApiError(error);
+      } catch (error: any) {
+        const message =
+          error?.body?.detail || error?.message || 'Failed to add section. Please try again.';
+        createSnackBar({
+          content: message,
+          severity: 'error',
+          autoHide: true,
+        });
         throw error;
       }
     },

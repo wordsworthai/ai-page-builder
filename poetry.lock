@@ -2916,7 +2916,7 @@ uvicorn = "^0.40.0"
 type = "git"
 url = "https://github.com/wordsworthai/langgraph-page-builder.git"
 reference = "main"
-resolved_reference = "ba93c52b97343aaeb7c1715af7724c78e644e79a"
+resolved_reference = "673d336ff4fda8321f494a3b0092b4e0ccd8ec62"
 
 [[package]]
 name = "langgraph-prebuilt"
