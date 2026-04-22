@@ -23,6 +23,7 @@ from app.products.page_builder.utils.generation.workflow_input_utils import (
 from app.shared.services.auth.users_service import get_current_user
 from app.products.page_builder.controllers.generation.helpers import (
     ensure_credits,
+    mark_generation_failed,
     resolve_generation_context,
     require_completed_generation,
 )
@@ -48,6 +49,7 @@ async def regenerate_color_theme(
     Regenerate color theme using AutopopOnlyWorkflow.
     Creates new GenerationVersion, runs autopop-only with new palette/font.
     """
+    new_generation_version_id = None
     try:
         business_id = await get_business_id_from_user(current_user, db)
         await ensure_credits(business_id, WorkflowTriggerType.REGENERATE_COLOR_THEME, db)
@@ -64,6 +66,7 @@ async def regenerate_color_theme(
         new_generation_version = await create_generation_version(
             page.page_id, WorkflowTriggerType.REGENERATE_COLOR_THEME.value, db
         )
+        new_generation_version_id = new_generation_version.generation_version_id
         state = await prepare_workflow_from_source(
             trigger_type=WorkflowTriggerType.REGENERATE_COLOR_THEME,
             mongo_db=mongo_db,
@@ -106,6 +109,7 @@ async def regenerate_color_theme(
     except HTTPException:
         raise
     except Exception as e:
+        await mark_generation_failed(db, new_generation_version_id, str(e))
         logger.error(
             f"Failed to regenerate color theme: {str(e)}", exc_info=True
         )
@@ -129,6 +133,7 @@ async def regenerate_content(
     Regenerate content using AutopopOnlyWorkflow with regenerate_mode="text".
     Creates new GenerationVersion, runs autopop-only for text only.
     """
+    new_generation_version_id = None
     try:
         # Prepare generation preflight and get business ID, Also validate credits.
         business_id = await get_business_id_from_user(current_user, db)
@@ -146,6 +151,7 @@ async def regenerate_content(
         new_generation_version = await create_generation_version(
             page.page_id, WorkflowTriggerType.REGENERATE_CONTENT.value, db
         )
+        new_generation_version_id = new_generation_version.generation_version_id
         state = await prepare_workflow_from_source(
             trigger_type=WorkflowTriggerType.REGENERATE_CONTENT,
             mongo_db=mongo_db,
@@ -184,6 +190,7 @@ async def regenerate_content(
     except HTTPException:
         raise
     except Exception as e:
+        await mark_generation_failed(db, new_generation_version_id, str(e))
         logger.error(
             f"Failed to regenerate content: {str(e)}", exc_info=True
         )
@@ -208,6 +215,7 @@ async def regenerate_section(
     Creates new GenerationVersion, triggers regenerate_section workflow.
     No redirect - stay on page, show overlay, poll status.
     """
+    new_generation_version_id = None
     try:
         business_id = await get_business_id_from_user(current_user, db)
         await ensure_credits(business_id, WorkflowTriggerType.SECTION_REGENERATION, db)
@@ -224,6 +232,7 @@ async def regenerate_section(
         new_generation_version = await create_generation_version(
             page.page_id, WorkflowTriggerType.SECTION_REGENERATION.value, db
         )
+        new_generation_version_id = new_generation_version.generation_version_id
         state = await prepare_workflow_from_source(
             trigger_type=WorkflowTriggerType.SECTION_REGENERATION,
             mongo_db=mongo_db,
@@ -264,6 +273,7 @@ async def regenerate_section(
     except HTTPException:
         raise
     except Exception as e:
+        await mark_generation_failed(db, new_generation_version_id, str(e))
         logger.error(
             f"Failed to regenerate section: {str(e)}",
             exc_info=True,

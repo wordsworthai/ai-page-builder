@@ -271,11 +271,10 @@ const DashboardV2: React.FC = () => {
       });
       navigate("/dashboard", { replace: true });
     } catch (error: any) {
-      // Don't re-set pending flag if error is due to insufficient credits
-      const isInsufficientCredits = error?.code === ERROR_CODES.INSUFFICIENT_CREDITS || error?.code === ERROR_CODES.QUOTA_EXCEEDED;
-      if (!isInsufficientCredits) {
-        setPendingBusinessDataCreation();
-      }
+      // Never re-set the pending flag on error — it causes an infinite retry loop
+      // when the useEffect sees the flag and re-triggers. The user can manually
+      // retry via the "Start Generation" button instead.
+      console.error("Generation trigger failed:", error?.message || error);
     } finally {
       setIsStartingGeneration(false);
       setIsPendingCreateSiteTrigger(false);

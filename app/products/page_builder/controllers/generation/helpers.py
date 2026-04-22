@@ -8,6 +8,7 @@ from typing import Any, Dict, Optional
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import select
 
 from app.core.db_mongo import get_mongo_database
 from app.products.page_builder.models import GenerationVersion, Website, WebsitePage
@@ -111,6 +112,37 @@ async def ensure_credits(
     """Check business has sufficient credits for the given operation. Raises 403 if insufficient."""
     required = get_credit_cost(operation)
     await require_credits(business_id, required, db)
+
+
+async def mark_generation_failed(
+    db: AsyncSession,
+    generation_version_id: Optional[uuid.UUID],
+    error: str,
+) -> None:
+    """
+    Mark a committed GenerationVersion as failed.
+    Called in except blocks after a workflow launch failure to prevent
+    orphaned pending rows from accumulating on retries.
+    """
+    if not generation_version_id:
+        return
+    try:
+        result = await db.execute(
+            select(GenerationVersion).where(
+                GenerationVersion.generation_version_id == generation_version_id,
+                GenerationVersion.status == "pending",
+            )
+        )
+        gen = result.scalar_one_or_none()
+        if gen:
+            gen.status = "failed"
+            gen.error_message = error[:500]
+            await db.commit()
+    except Exception:
+        logger.warning(
+            f"Could not mark generation {generation_version_id} as failed after error",
+            exc_info=True,
+        )
 
 
 async def persist_workflow_input(

@@ -8,7 +8,7 @@ from app.core.db import get_async_db_session
 from app.core.db_mongo import get_mongo_database
 from app.shared.schemas.auth.auth import CurrentUserResponse
 from app.products.page_builder.schemas.generation.generation import GeneratePageRequest, GeneratePageResponse
-from app.products.page_builder.controllers.generation.helpers import ensure_credits
+from app.products.page_builder.controllers.generation.helpers import ensure_credits, mark_generation_failed
 from app.shared.config.credits import WorkflowTriggerType
 from app.shared.utils.user_helpers import get_business_id_from_user
 from app.products.page_builder.services.generation.page_generation import GenerationService
@@ -28,6 +28,7 @@ async def trigger_page_generation(
     current_user: CurrentUserResponse = Depends(get_current_user),
 ):
     """Trigger AI page generation."""
+    generation_version_id = None
     try:
         business_id = await get_business_id_from_user(current_user, db)
         await ensure_credits(business_id, WorkflowTriggerType.CREATE_SITE, db)
@@ -89,6 +90,7 @@ async def trigger_page_generation(
     except HTTPException:
         raise
     except Exception as e:
+        await mark_generation_failed(db, generation_version_id, str(e))
         logger.error(f"Failed to trigger generation: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=500, detail=f"Failed to start generation: {str(e)}"

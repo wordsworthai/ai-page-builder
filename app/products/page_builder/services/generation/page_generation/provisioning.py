@@ -109,15 +109,28 @@ async def provision_for_create_site(
         db.add(homepage)
         await db.flush()
 
-    generation_version = GenerationVersion(
-        generation_version_id=uuid.uuid4(),
-        entity_id=homepage.page_id,
-        entity_type="page",
-        generation_scope=WorkflowTriggerType.CREATE_SITE.value,
-        status="pending",
-        created_at=datetime.now(UTC).replace(tzinfo=None),
+    # Reuse an existing pending generation for this page instead of creating duplicates.
+    # This prevents orphaned rows when the workflow launch fails and the user retries.
+    existing_pending = await db.execute(
+        select(GenerationVersion).where(
+            GenerationVersion.entity_id == homepage.page_id,
+            GenerationVersion.generation_scope == WorkflowTriggerType.CREATE_SITE.value,
+            GenerationVersion.status == "pending",
+        ).order_by(GenerationVersion.created_at.desc())
     )
-    db.add(generation_version)
+    generation_version = existing_pending.scalar_one_or_none()
+
+    if not generation_version:
+        generation_version = GenerationVersion(
+            generation_version_id=uuid.uuid4(),
+            entity_id=homepage.page_id,
+            entity_type="page",
+            generation_scope=WorkflowTriggerType.CREATE_SITE.value,
+            status="pending",
+            created_at=datetime.now(UTC).replace(tzinfo=None),
+        )
+        db.add(generation_version)
+
     await db.commit()
 
     await db.refresh(website)
